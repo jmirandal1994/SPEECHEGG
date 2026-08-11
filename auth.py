@@ -11,10 +11,14 @@ def iniciar_sesion(email: str, password: str):
     client = get_client()
     try:
         resultado = client.auth.sign_in_with_password({"email": email, "password": password})
-    except Exception:
+    except Exception as e:
+        # Log del error real para diagnóstico (aparece en Vercel → Runtime Logs).
+        # El mensaje mostrado al usuario se mantiene genérico por seguridad.
+        print(f"[AUTH ERROR] Falló sign_in_with_password para '{email}': {repr(e)}")
         return False, "Usuario o contraseña incorrectos."
 
     if not resultado.session:
+        print(f"[AUTH ERROR] sign_in_with_password sin sesión para '{email}': {resultado}")
         return False, "Usuario o contraseña incorrectos."
 
     user_id = resultado.user.id
@@ -22,8 +26,12 @@ def iniciar_sesion(email: str, password: str):
     # Traemos el perfil (rol, nombre) con el cliente admin para no depender
     # de que la sesión recién creada ya tenga permisos propagados.
     admin = get_admin_client()
-    perfil_res = admin.table("profiles").select("*").eq("id", user_id).single().execute()
-    perfil = perfil_res.data
+    try:
+        perfil_res = admin.table("profiles").select("*").eq("id", user_id).single().execute()
+        perfil = perfil_res.data
+    except Exception as e:
+        print(f"[AUTH ERROR] Falló lectura de profiles para user_id '{user_id}': {repr(e)}")
+        return False, "Tu cuenta se autenticó pero no se encontró su perfil. Contacta al administrador."
 
     if not perfil or not perfil.get("activo", True):
         return False, "Esta cuenta no está activa. Contacta al administrador."
