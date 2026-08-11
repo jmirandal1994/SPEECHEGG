@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% block title %}Panel administrador · Speech Psychology{% endblock %}
+{% block content %}
+
+<div class="page-header">
+    <h1>Panel de administración</h1>
+    <p>Hola, {{ nombre }} — vista general del equipo clínico.</p>
+</div>
+
+<svg class="eeg-wave divider-wave" viewBox="0 0 900 24" xmlns="http://www.w3.org/2000/svg" style="max-width:100%;">
+    <path d="M0,12 L380,12 L388,4 L396,20 L404,12 L900,12" stroke="#12A594"/>
+</svg>
+
+<div class="stat-grid">
+    <div class="stat-card">
+        <div class="stat-card__label">Doctores activos</div>
+        <div class="stat-card__value mono">{{ doctores|length }}</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-card__label">Estudios sin informar</div>
+        <div class="stat-card__value amber mono">{{ pacientes_sin_informar }}</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-card__label">Correcciones pendientes</div>
+        <div class="stat-card__value mono" style="color: var(--color-red);">{{ correcciones_pendientes }}</div>
+    </div>
+</div>
+
+<div class="panel">
+    <div class="panel__header">
+        <h2>Equipo clínico — en vivo</h2>
+    </div>
+    {% if doctores %}
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>Doctor</th>
+                <th>Especialidad</th>
+                <th>Informes generados</th>
+                <th>Estado</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for doc in doctores %}
+            <tr>
+                <td>{{ doc.nombre }}</td>
+                <td>{{ doc.especialidad or '—' }}</td>
+                <td class="mono">{{ doc.informes_generados }}</td>
+                <td>
+                    {% if doc.presencia == 'online' %}
+                        <span class="pill pill-online"><span class="pill-dot"></span>Conectado</span>
+                    {% elif doc.presencia == 'informando' %}
+                        <span class="pill pill-informando"><span class="pill-dot"></span>Informando</span>
+                    {% else %}
+                        <span class="pill pill-offline"><span class="pill-dot"></span>Desconectado</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <div class="empty-state">Aún no hay doctores registrados en el sistema.</div>
+    {% endif %}
+</div>
+
+<div class="panel" style="margin-top: 20px;">
+    <div class="panel__header">
+        <h2>Próximos módulos</h2>
+    </div>
+    <div class="empty-state">
+        Aquí vas a poder crear cuentas de doctor, cargar el Excel de pacientes,
+        asignar pacientes a cada doctor, gestionar las plantillas PDF por doctor,
+        y resolver las solicitudes de corrección. Se construye en la siguiente etapa.
+    </div>
+</div>
+
+{% endblock %}
