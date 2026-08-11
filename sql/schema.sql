@@ -91,6 +91,7 @@ create table public.informes (
 
 create index idx_informes_doctor on public.informes(doctor_id);
 create index idx_informes_marcado on public.informes(marcado_informado);
+alter table public.informes add constraint informes_estudio_id_unique unique (estudio_id);
 
 -- ---------------------------------------------------------------------
 -- 6) CORRECCIONES — flujo doctor <-> admin

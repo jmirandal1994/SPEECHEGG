@@ -24,11 +24,25 @@
 
 <div class="panel">
     <div class="panel__header">
+        <h2>Mi plantilla PDF</h2>
+    </div>
+    <div class="empty-state" style="padding: 30px 22px;">
+        <a href="{{ url_for('doctor_bp.plantilla') }}" class="btn btn-primary" style="width: auto; display: inline-flex;">
+            Ir a mi plantilla PDF
+        </a>
+        <p style="margin-top: 14px; color: var(--color-ink-faint); font-size: 13.5px;">
+            Sube tu PDF base y calibra dónde cae cada campo del informe.
+        </p>
+    </div>
+</div>
+
+<div class="panel" style="margin-top: 20px;">
+    <div class="panel__header">
         <h2>Próximos módulos</h2>
     </div>
     <div class="empty-state">
-        Aquí vas a ver tu lista de pacientes asignados, la carga manual de nuevos pacientes,
-        y el generador de informes EEG con tu plantilla PDF. Se construye en la siguiente etapa.
+        Aquí vas a ver tu lista de pacientes asignados y la carga manual de nuevos pacientes.
+        Se construye en la siguiente etapa.
     </div>
 </div>
 

@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% block title %}Informe EEG · Speech Psychology{% endblock %}
+{% block content %}
+
+<div class="page-header">
+    <h1>Informe EEG</h1>
+    <p>{{ paciente.nombre_completo or 'Paciente' }} — estudio del {{ estudio.fecha_estudio }}</p>
+</div>
+
+<svg class="eeg-wave divider-wave" viewBox="0 0 900 24" xmlns="http://www.w3.org/2000/svg" style="max-width:100%;">
+    <path d="M0,12 L380,12 L388,4 L396,20 L404,12 L900,12" stroke="#2F6FA8"/>
+</svg>
+
+<div class="panel">
+    <div class="panel__header">
+        <h2>Datos del paciente</h2>
+    </div>
+    <div style="padding: 18px 22px; display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 14px; font-size: 14px;">
+        <div><strong>Nombre:</strong><br>{{ paciente.nombre_completo or '—' }}</div>
+        <div><strong>RUT:</strong><br>{{ paciente.rut or '—' }}</div>
+        <div><strong>Fecha nacimiento:</strong><br>{{ paciente.fecha_nacimiento or '—' }}</div>
+        <div><strong>Tipo de registro:</strong><br>{{ estudio.tipo_registro or '—' }}</div>
+    </div>
+</div>
+
+<div class="panel" style="margin-top: 20px;">
+    <div class="panel__header">
+        <h2>Contenido del informe</h2>
+    </div>
+    <div style="padding: 22px;">
+        <form method="POST">
+            <div class="field">
+                <label for="tecnica">Técnica</label>
+                <textarea id="tecnica" name="tecnica" rows="2" style="width:100%; padding:12px 14px; border:1px solid var(--color-border); border-radius:var(--radius-sm); font-family:inherit;"></textarea>
+            </div>
+            <div class="field">
+                <label for="actividad_base">Actividad de base</label>
+                <textarea id="actividad_base" name="actividad_base" rows="3" style="width:100%; padding:12px 14px; border:1px solid var(--color-border); border-radius:var(--radius-sm); font-family:inherit;"></textarea>
+            </div>
+            <div class="field">
+                <label for="hallazgos">Hallazgos</label>
+                <textarea id="hallazgos" name="hallazgos" rows="4" style="width:100%; padding:12px 14px; border:1px solid var(--color-border); border-radius:var(--radius-sm); font-family:inherit;"></textarea>
+            </div>
+            <div class="field">
+                <label for="impresion_diagnostica">Impresión diagnóstica</label>
+                <textarea id="impresion_diagnostica" name="impresion_diagnostica" rows="3" style="width:100%; padding:12px 14px; border:1px solid var(--color-border); border-radius:var(--radius-sm); font-family:inherit;"></textarea>
+            </div>
+            <div class="field">
+                <label for="correlacion_clinica">Correlación clínica</label>
+                <textarea id="correlacion_clinica" name="correlacion_clinica" rows="3" style="width:100%; padding:12px 14px; border:1px solid var(--color-border); border-radius:var(--radius-sm); font-family:inherit;"></textarea>
+            </div>
+            <div class="field">
+                <label for="conclusion">Conclusión</label>
+                <textarea id="conclusion" name="conclusion" rows="3" style="width:100%; padding:12px 14px; border:1px solid var(--color-border); border-radius:var(--radius-sm); font-family:inherit;"></textarea>
+            </div>
+
+            <button type="submit" class="btn btn-primary" style="width: auto;">
+                Generar PDF y marcar como informado
+            </button>
+        </form>
+    </div>
+</div>
+
+{% endblock %}

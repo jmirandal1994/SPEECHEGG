@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% block title %}Mi plantilla PDF · Speech Psychology{% endblock %}
+{% block content %}
+
+<div class="page-header">
+    <h1>Mi plantilla PDF</h1>
+    <p>Esta es la base sobre la que se generan tus informes EEG.</p>
+</div>
+
+<svg class="eeg-wave divider-wave" viewBox="0 0 900 24" xmlns="http://www.w3.org/2000/svg" style="max-width:100%;">
+    <path d="M0,12 L380,12 L388,4 L396,20 L404,12 L900,12" stroke="#2F6FA8"/>
+</svg>
+
+<div class="panel" style="margin-bottom: 20px;">
+    <div class="panel__header">
+        <h2>Estado actual</h2>
+    </div>
+    <div style="padding: 22px;">
+        {% if plantilla %}
+            <p style="margin: 0 0 6px; color: var(--color-ink);">
+                ✅ Tienes una plantilla cargada: <strong>{{ plantilla.nombre_archivo }}</strong>
+            </p>
+            <p style="margin: 0; color: var(--color-ink-soft); font-size: 13.5px;">
+                Actualizada el {{ plantilla.actualizado_at }}
+            </p>
+        {% else %}
+            <p style="margin: 0; color: var(--color-ink-soft);">
+                Todavía no has subido tu plantilla PDF base. Sin ella no vas a poder generar informes.
+            </p>
+        {% endif %}
+    </div>
+</div>
+
+<div class="panel" style="margin-bottom: 20px;">
+    <div class="panel__header">
+        <h2>Subir / reemplazar plantilla</h2>
+    </div>
+    <div style="padding: 22px;">
+        <form method="POST" enctype="multipart/form-data">
+            <div class="field">
+                <label for="pdf_base">Archivo PDF (una página)</label>
+                <input type="file" id="pdf_base" name="pdf_base" accept="application/pdf" required>
+            </div>
+            <button type="submit" class="btn btn-primary" style="width: auto;">Subir plantilla</button>
+        </form>
+    </div>
+</div>
+
+{% if plantilla %}
+<div class="panel">
+    <div class="panel__header">
+        <h2>Calibrar coordenadas</h2>
+    </div>
+    <div style="padding: 22px;">
+        <p style="color: var(--color-ink-soft); margin-top: 0;">
+            Descarga tu plantilla con una grilla de referencia dibujada encima (cada 50 puntos),
+            para saber exactamente dónde debe caer cada campo del informe.
+        </p>
+        <a href="{{ url_for('doctor_bp.plantilla_grid') }}" class="btn btn-secondary" target="_blank">
+            Descargar PDF con grilla
+        </a>
+        <p style="color: var(--color-ink-faint); font-size: 13px; margin-top: 16px; margin-bottom: 0;">
+            Con esas coordenadas, pídele al equipo técnico que ajuste <code>COORDS_INFORME_EEG</code>
+            en <code>pdf_engine.py</code> para que cada campo caiga en el lugar correcto de tu plantilla.
+        </p>
+    </div>
+</div>
+{% endif %}
+
+{% endblock %}
