@@ -8,6 +8,9 @@ def iniciar_sesion(email: str, password: str):
     Autentica contra Supabase Auth. Devuelve (ok: bool, mensaje_error: str|None).
     Si es exitoso, guarda tokens y perfil en la sesión de Flask (cookie firmada).
     """
+    from config import Config
+    print(f"[AUTH DEBUG] Intentando login para '{email}' contra SUPABASE_URL='{Config.SUPABASE_URL}'")
+
     client = get_client()
     try:
         resultado = client.auth.sign_in_with_password({"email": email, "password": password})

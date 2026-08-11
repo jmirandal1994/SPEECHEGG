@@ -1,4 +1,5 @@
 import os
+import re
 
 
 def _limpiar_supabase_url(url: str | None) -> str | None:
@@ -22,13 +23,13 @@ class Config:
     En Vercel: configúralas en Project Settings → Environment Variables.
     NUNCA escribas claves reales directamente en este archivo.
     """
-    SECRET_KEY = os.environ.get("SECRET_KEY")
+    SECRET_KEY = (os.environ.get("SECRET_KEY") or "").strip() or None
 
     SUPABASE_URL = _limpiar_supabase_url(os.environ.get("SUPABASE_URL"))
-    SUPABASE_ANON_KEY = os.environ.get("SUPABASE_ANON_KEY")
+    SUPABASE_ANON_KEY = (os.environ.get("SUPABASE_ANON_KEY") or "").strip() or None
     # La service key bypassea RLS. Se usa SOLO en el backend, para
     # operaciones de administrador (crear usuarios, subir Excel, etc).
-    SUPABASE_SERVICE_KEY = os.environ.get("SUPABASE_SERVICE_KEY")
+    SUPABASE_SERVICE_KEY = (os.environ.get("SUPABASE_SERVICE_KEY") or "").strip() or None
 
     MAX_CONTENT_LENGTH = 16 * 1024 * 1024  # 16 MB máx. por archivo subido
 
@@ -45,3 +46,15 @@ def validate_config():
             "Revisa tu archivo .env (local) o la configuración de Vercel (producción)."
         )
     print(f"[CONFIG] SUPABASE_URL normalizada en uso: {Config.SUPABASE_URL}")
+
+    # Validación de formato JWT (mismo patrón que usa la librería supabase-py),
+    # para detectar claves mal copiadas ANTES de que fallen a mitad del login.
+    patron_jwt = r"^[A-Za-z0-9\-_=]+\.[A-Za-z0-9\-_=]+\.?[A-Za-z0-9\-_.+/=]*$"
+    for nombre_var in ("SUPABASE_ANON_KEY", "SUPABASE_SERVICE_KEY"):
+        valor = getattr(Config, nombre_var)
+        es_valido = bool(re.match(patron_jwt, valor))
+        print(f"[CONFIG] {nombre_var}: largo={len(valor)}, formato_jwt_valido={es_valido}, "
+              f"empieza_con='{valor[:6]}', termina_con='{valor[-6:]}'")
+        if not es_valido:
+            print(f"[CONFIG] ADVERTENCIA: {nombre_var} no tiene formato JWT válido. "
+                  "Revisa que no tenga espacios/saltos de línea ocultos, o que sea la clave legacy (empieza con 'eyJ'), no la nueva 'sb_...'.")
