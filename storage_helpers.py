@@ -1,39 +1,34 @@
 """
-Acceso a Supabase Storage para las plantillas PDF de cada doctor y los
-informes ya generados. Todo pasa por el cliente admin (service role) —
-son documentos clínicos, así que el control de acceso lo hacen las
-rutas de Flask (@requiere_login / @requiere_admin), no políticas
-públicas de Storage.
+Acceso a los PDFs del proyecto:
+- Las plantillas BASE de cada doctor viven en el repo, en la carpeta
+  plantillas_pdf/ (se suben directo a GitHub, ver plantillas_pdf/README.md).
+  Vercel despliega el filesystem como solo-lectura, así que estos archivos
+  se leen directo del código desplegado — nunca se escriben en runtime.
+- Los informes YA GENERADOS (dinámicos, uno por paciente) sí necesitan
+  persistir más allá de una sola ejecución, así que esos van a Supabase
+  Storage (bucket informes-pdf) a través del cliente admin (service role).
 """
+from pathlib import Path
 from supabase_client import get_admin_client
 
-BUCKET_PLANTILLAS = "plantillas-pdf"
+PLANTILLAS_DIR = Path(__file__).resolve().parent / "plantillas_pdf"
 BUCKET_INFORMES = "informes-pdf"
 
 
-def subir_plantilla_doctor(doctor_id: str, contenido_pdf: bytes) -> str:
-    """Sube (o reemplaza) la plantilla PDF base de un doctor."""
-    admin = get_admin_client()
-    path = f"{doctor_id}.pdf"
-    admin.storage.from_(BUCKET_PLANTILLAS).upload(
-        path,
-        contenido_pdf,
-        {"content-type": "application/pdf", "upsert": "true"},
-    )
-    return path
-
-
-def descargar_plantilla_doctor(doctor_id: str) -> bytes | None:
-    """Descarga la plantilla PDF base de un doctor, o None si no tiene."""
-    admin = get_admin_client()
-    try:
-        return admin.storage.from_(BUCKET_PLANTILLAS).download(f"{doctor_id}.pdf")
-    except Exception:
+def obtener_plantilla_doctor(doctor_id: str) -> bytes | None:
+    """Lee la plantilla PDF base de un doctor desde el repo. None si no existe."""
+    ruta = PLANTILLAS_DIR / f"{doctor_id}.pdf"
+    if not ruta.exists():
         return None
+    return ruta.read_bytes()
+
+
+def existe_plantilla_doctor(doctor_id: str) -> bool:
+    return (PLANTILLAS_DIR / f"{doctor_id}.pdf").exists()
 
 
 def subir_informe_generado(informe_id: str, contenido_pdf: bytes) -> str:
-    """Sube el PDF final ya generado de un informe."""
+    """Sube el PDF final ya generado de un informe a Supabase Storage."""
     admin = get_admin_client()
     path = f"{informe_id}.pdf"
     admin.storage.from_(BUCKET_INFORMES).upload(

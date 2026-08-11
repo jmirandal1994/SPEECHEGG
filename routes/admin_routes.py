@@ -1,6 +1,9 @@
-from flask import Blueprint, render_template, session, g
+from flask import Blueprint, render_template, session, g, redirect, url_for, flash, send_file
+import io
 from auth import requiere_admin
 from supabase_client import get_client
+from storage_helpers import existe_plantilla_doctor, obtener_plantilla_doctor
+from pdf_engine import generar_pdf_con_grilla
 
 admin_bp = Blueprint("admin_bp", __name__, url_prefix="/admin")
 
@@ -37,6 +40,9 @@ def dashboard():
         )
         estado_presencia = presencia_por_usuario.get(doc["id"], {}).get("estado", "offline")
         doc["presencia"] = estado_presencia
+        # La plantilla ya no vive en Supabase: se lee directo del repo
+        # (carpeta plantillas_pdf/), ver storage_helpers.py.
+        doc["tiene_plantilla"] = existe_plantilla_doctor(doc["id"])
 
     correcciones_pendientes = (
         client.table("correcciones").select("id", count="exact").eq("estado", "pendiente").execute()
@@ -52,4 +58,50 @@ def dashboard():
         doctores=doctores,
         correcciones_pendientes=correcciones_pendientes,
         pacientes_sin_informar=pacientes_sin_informar,
+    )
+
+
+@admin_bp.route("/doctores/<doctor_id>/plantilla")
+@requiere_admin
+def plantilla_doctor(doctor_id):
+    """
+    Página de estado de la plantilla PDF de un doctor. Ya no se sube
+    desde aquí (el filesystem de Vercel es de solo lectura en producción):
+    la plantilla se agrega directo al repo, en plantillas_pdf/<uuid>.pdf.
+    Esta página solo muestra el UUID exacto a usar y si el archivo
+    ya está detectado en el deployment actual.
+    """
+    client = _cliente_sesion()
+
+    doctor_res = (
+        client.table("profiles").select("id, nombre").eq("id", doctor_id).single().execute()
+    )
+    doctor = doctor_res.data
+    if not doctor:
+        flash("Doctor no encontrado.", "danger")
+        return redirect(url_for("admin_bp.dashboard"))
+
+    tiene_plantilla = existe_plantilla_doctor(doctor_id)
+
+    return render_template(
+        "admin_plantilla_doctor.html",
+        doctor=doctor,
+        tiene_plantilla=tiene_plantilla,
+    )
+
+
+@admin_bp.route("/doctores/<doctor_id>/plantilla/grid")
+@requiere_admin
+def plantilla_doctor_grid(doctor_id):
+    contenido = obtener_plantilla_doctor(doctor_id)
+    if not contenido:
+        flash("Este doctor todavía no tiene una plantilla PDF en el repo.", "warning")
+        return redirect(url_for("admin_bp.plantilla_doctor", doctor_id=doctor_id))
+
+    pdf_con_grilla = generar_pdf_con_grilla(contenido)
+    return send_file(
+        io.BytesIO(pdf_con_grilla),
+        mimetype="application/pdf",
+        as_attachment=False,
+        download_name="plantilla_con_grilla.pdf",
     )

@@ -37,6 +37,7 @@
                 <th>Doctor</th>
                 <th>Especialidad</th>
                 <th>Informes generados</th>
+                <th>Plantilla PDF</th>
                 <th>Estado</th>
             </tr>
         </thead>
@@ -46,6 +47,15 @@
                 <td>{{ doc.nombre }}</td>
                 <td>{{ doc.especialidad or '—' }}</td>
                 <td class="mono">{{ doc.informes_generados }}</td>
+                <td>
+                    <a href="{{ url_for('admin_bp.plantilla_doctor', doctor_id=doc.id) }}">
+                        {% if doc.tiene_plantilla %}
+                            <span class="pill pill-online"><span class="pill-dot"></span>Cargada</span>
+                        {% else %}
+                            <span class="pill pill-offline"><span class="pill-dot"></span>Falta subir</span>
+                        {% endif %}
+                    </a>
+                </td>
                 <td>
                     {% if doc.presencia == 'online' %}
                         <span class="pill pill-online"><span class="pill-dot"></span>Conectado</span>

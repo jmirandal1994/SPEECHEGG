@@ -28,7 +28,24 @@ etapa), el primer admin se crea manualmente:
 Los siguientes usuarios (doctores) se van a poder crear directamente
 desde el panel de administrador una vez que construyamos ese módulo.
 
-## 3. Configurar variables de entorno (local)
+## 3. Agregar la plantilla PDF de un doctor
+
+Las plantillas PDF NO se suben desde la web (el filesystem de Vercel es
+de solo lectura en producción) — viven directo en el repo:
+
+1. Entra a `/admin/doctores/<id>/plantilla` (o a la tabla de doctores en
+   el dashboard admin) para ver el UUID exacto del doctor.
+2. Sube un archivo llamado `<uuid-del-doctor>.pdf` a la carpeta
+   `plantillas_pdf/` del repo, directo en GitHub.
+3. Commit + push. Cuando Vercel termine de desplegar, la plantilla queda
+   activa automáticamente para ese doctor.
+4. Para calibrar en qué coordenadas cae cada campo del informe sobre esa
+   plantilla, usa el botón "Descargar PDF con grilla de coordenadas" en
+   esa misma página — te devuelve el PDF con una grilla roja numerada
+   cada 50pt encima. Con esos números, ajustamos `COORDS_INFORME_EEG`
+   en `pdf_engine.py`.
+
+## 4. Configurar variables de entorno (local)
 
 ```bash
 cp .env.example .env
@@ -38,7 +55,7 @@ Completa `.env` con los valores del paso 1, más un `SECRET_KEY` propio
 (cualquier string largo y aleatorio, por ejemplo generado con
 `python -c "import secrets; print(secrets.token_hex(32))"`).
 
-## 4. Correr localmente
+## 5. Correr localmente
 
 ```bash
 python3 -m venv venv
@@ -49,7 +66,7 @@ python app.py
 
 Abre `http://localhost:5000` — deberías ver la pantalla de login.
 
-## 5. Subir a GitHub
+## 6. Subir a GitHub
 
 ```bash
 git init
@@ -63,7 +80,7 @@ git push -u origin main
 `.gitignore` ya está configurado para que `.env` (tus claves reales)
 nunca se suba al repositorio.
 
-## 6. Desplegar en Vercel
+## 7. Desplegar en Vercel
 
 1. En [vercel.com](https://vercel.com), **Add New → Project** e importa
    el repositorio de GitHub.

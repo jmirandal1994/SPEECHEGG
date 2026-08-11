@@ -3,12 +3,8 @@ import io
 from datetime import datetime, timezone
 from auth import requiere_login
 from supabase_client import get_client
-from storage_helpers import (
-    subir_plantilla_doctor,
-    descargar_plantilla_doctor,
-    subir_informe_generado,
-)
-from pdf_engine import generar_informe_pdf, generar_pdf_con_grilla
+from storage_helpers import obtener_plantilla_doctor, subir_informe_generado
+from pdf_engine import generar_informe_pdf
 
 doctor_bp = Blueprint("doctor_bp", __name__, url_prefix="/doctor")
 
@@ -52,60 +48,6 @@ def dashboard():
     )
 
 
-@doctor_bp.route("/plantilla", methods=["GET", "POST"])
-@requiere_login
-def plantilla():
-    client = _cliente_sesion()
-
-    if request.method == "POST":
-        archivo = request.files.get("pdf_base")
-        if not archivo or not archivo.filename.lower().endswith(".pdf"):
-            flash("Sube un archivo PDF válido.", "danger")
-            return redirect(url_for("doctor_bp.plantilla"))
-
-        contenido = archivo.read()
-        try:
-            subir_plantilla_doctor(g.user_id, contenido)
-        except Exception as e:
-            print(f"[PLANTILLA ERROR] {repr(e)}")
-            flash("No se pudo subir el PDF. Revisa que los buckets de Storage estén creados "
-                  "(sql/storage_setup.sql).", "danger")
-            return redirect(url_for("doctor_bp.plantilla"))
-
-        client.table("plantillas_pdf").upsert({
-            "doctor_id": g.user_id,
-            "nombre_archivo": archivo.filename,
-            "url_pdf_base": f"{g.user_id}.pdf",
-        }, on_conflict="doctor_id").execute()
-
-        flash("Plantilla PDF actualizada correctamente.", "success")
-        return redirect(url_for("doctor_bp.plantilla"))
-
-    plantilla_res = (
-        client.table("plantillas_pdf").select("*").eq("doctor_id", g.user_id).execute()
-    )
-    plantilla_actual = plantilla_res.data[0] if plantilla_res.data else None
-
-    return render_template("doctor_plantilla.html", plantilla=plantilla_actual)
-
-
-@doctor_bp.route("/plantilla/grid")
-@requiere_login
-def plantilla_grid():
-    contenido = descargar_plantilla_doctor(g.user_id)
-    if not contenido:
-        flash("Todavía no subes una plantilla PDF.", "warning")
-        return redirect(url_for("doctor_bp.plantilla"))
-
-    pdf_con_grilla = generar_pdf_con_grilla(contenido)
-    return send_file(
-        io.BytesIO(pdf_con_grilla),
-        mimetype="application/pdf",
-        as_attachment=False,
-        download_name="plantilla_con_grilla.pdf",
-    )
-
-
 @doctor_bp.route("/estudio/<estudio_id>/informe", methods=["GET", "POST"])
 @requiere_login
 def informe_estudio(estudio_id):
@@ -135,10 +77,11 @@ def informe_estudio(estudio_id):
             "conclusion": request.form.get("conclusion", "").strip(),
         }
 
-        plantilla_bytes = descargar_plantilla_doctor(g.user_id)
+        plantilla_bytes = obtener_plantilla_doctor(g.user_id)
         if not plantilla_bytes:
-            flash("Antes de generar un informe, sube tu plantilla PDF base.", "warning")
-            return redirect(url_for("doctor_bp.plantilla"))
+            flash("Tu administrador todavía no ha cargado tu plantilla PDF base. "
+                  "Pídele que la suba desde el panel de administración.", "warning")
+            return redirect(url_for("doctor_bp.dashboard"))
 
         campos_pdf = dict(campos_informe)
         campos_pdf.update({
