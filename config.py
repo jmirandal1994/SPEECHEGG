@@ -1,6 +1,20 @@
 import os
 
 
+def _limpiar_supabase_url(url: str | None) -> str | None:
+    """
+    Normaliza SUPABASE_URL por si quedó con rutas o barras de más
+    (ej: '.../rest/v1/' en vez de solo el dominio base).
+    """
+    if not url:
+        return url
+    url = url.strip().rstrip("/")
+    for sufijo in ("/rest/v1", "/auth/v1"):
+        if url.endswith(sufijo):
+            url = url[: -len(sufijo)]
+    return url.rstrip("/")
+
+
 class Config:
     """
     Toda la configuración sensible viene de variables de entorno.
@@ -10,7 +24,7 @@ class Config:
     """
     SECRET_KEY = os.environ.get("SECRET_KEY")
 
-    SUPABASE_URL = os.environ.get("SUPABASE_URL")
+    SUPABASE_URL = _limpiar_supabase_url(os.environ.get("SUPABASE_URL"))
     SUPABASE_ANON_KEY = os.environ.get("SUPABASE_ANON_KEY")
     # La service key bypassea RLS. Se usa SOLO en el backend, para
     # operaciones de administrador (crear usuarios, subir Excel, etc).
@@ -30,3 +44,4 @@ def validate_config():
             f"Faltan variables de entorno requeridas: {', '.join(faltantes)}. "
             "Revisa tu archivo .env (local) o la configuración de Vercel (producción)."
         )
+    print(f"[CONFIG] SUPABASE_URL normalizada en uso: {Config.SUPABASE_URL}")
