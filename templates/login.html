@@ -5,22 +5,25 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ingresar · Speech Psychology</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Newsreader:wght@400;500;600&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
 <div class="auth-shell">
     <section class="auth-shell__panel">
-        <div class="auth-shell__brand">Speech <span>·</span> Psychology</div>
+        <div class="auth-shell__brand">
+            <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Speech Psychology">
+            <div class="auth-shell__brand-text">Speech Psychology<small>Sistema clínico EEG</small></div>
+        </div>
 
         <div>
             <p class="auth-shell__tagline">Lectura e informes de electroencefalograma, en un solo lugar.</p>
 
             <div class="auth-shell__waves">
                 <svg class="eeg-wave eeg-wave--animated" viewBox="0 0 480 140" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M0,30 L40,30 L48,10 L56,50 L64,30 L100,30 L108,18 L116,42 L124,30 L480,30" stroke="#12A594" opacity="0.9"/>
-                    <path d="M0,70 L60,70 L68,55 L76,85 L84,70 L140,70 L148,60 L156,80 L164,70 L480,70" stroke="#6BE0CE" opacity="0.7"/>
-                    <path d="M0,110 L80,110 L88,95 L96,122 L104,110 L180,110 L188,100 L196,120 L204,110 L480,110" stroke="#3D7A9E" opacity="0.55"/>
+                    <path d="M0,30 L40,30 L48,10 L56,50 L64,30 L100,30 L108,18 L116,42 L124,30 L480,30" stroke="#6FA8DC" opacity="0.9"/>
+                    <path d="M0,70 L60,70 L68,55 L76,85 L84,70 L140,70 L148,60 L156,80 L164,70 L480,70" stroke="#3F7FB5" opacity="0.7"/>
+                    <path d="M0,110 L80,110 L88,95 L96,122 L104,110 L180,110 L188,100 L196,120 L204,110 L480,110" stroke="#2C5F8C" opacity="0.55"/>
                 </svg>
             </div>
         </div>
@@ -30,7 +33,10 @@
 
     <section class="auth-shell__form">
         <div class="auth-card">
-            <div class="auth-card__mobile-brand">Speech · Psychology</div>
+            <div class="auth-card__mobile-brand">
+                <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Speech Psychology">
+                Speech Psychology
+            </div>
             <h1>Bienvenido de vuelta</h1>
             <p class="subtitle">Ingresa con tu cuenta de doctor o administrador.</p>
 

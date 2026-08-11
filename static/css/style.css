@@ -1,24 +1,29 @@
 /* =====================================================================
    Speech Psychology · Sistema de diseño
-   Paleta clínica: tinta navy profunda + acento teal (señal EEG)
-   Tipografía: Newsreader (display) + Inter (UI) + IBM Plex Mono (datos)
+   Paleta de marca: azul Speech Psychology + gris pizarra del logo
+   Tipografía: Montserrat (display) + Inter (UI) + IBM Plex Mono (datos)
    ===================================================================== */
 
 :root {
-    --color-bg: #F5F8FC;
+    --color-bg: #F4F7FB;
     --color-bg-card: #FFFFFF;
-    --color-bg-alt: #ECF1F8;
-    --color-ink: #0B1F3A;
-    --color-ink-soft: #4C5D77;
-    --color-ink-faint: #8493A8;
-    --color-border: #DEE6F1;
+    --color-bg-alt: #EAF0F8;
+    --color-ink: #16324A;
+    --color-ink-soft: #52697E;
+    --color-ink-faint: #8DA0B3;
+    --color-border: #DCE6F0;
 
-    --color-navy-panel: #0B1F3A;
-    --color-navy-panel-2: #12294B;
+    --color-brand: #2F6FA8;
+    --color-brand-deep: #1E4D7B;
+    --color-brand-2: #16324A;
 
-    --color-accent: #12A594;
-    --color-accent-strong: #0C7D71;
-    --color-accent-soft: #D7F2EE;
+    /* alias para los paneles oscuros (login split-screen, topbar) */
+    --color-navy-panel: #16324A;
+    --color-navy-panel-2: #0E2338;
+
+    --color-accent: #2F6FA8;
+    --color-accent-strong: #1E4D7B;
+    --color-accent-soft: #E1EDF8;
 
     --color-amber: #C77B12;
     --color-amber-soft: #FBECD6;
@@ -31,9 +36,9 @@
     --radius-md: 14px;
     --radius-lg: 22px;
 
-    --shadow-card: 0 1px 2px rgba(11, 31, 58, 0.04), 0 8px 24px rgba(11, 31, 58, 0.06);
+    --shadow-card: 0 1px 2px rgba(22, 50, 74, 0.05), 0 8px 24px rgba(22, 50, 74, 0.07);
 
-    --font-display: "Newsreader", Georgia, "Times New Roman", serif;
+    --font-display: "Montserrat", "Inter", -apple-system, sans-serif;
     --font-body: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     --font-mono: "IBM Plex Mono", "SF Mono", Consolas, monospace;
 }
@@ -53,7 +58,7 @@ html, body {
 
 h1, h2, h3, .font-display {
     font-family: var(--font-display);
-    font-weight: 500;
+    font-weight: 600;
     letter-spacing: -0.01em;
     color: var(--color-ink);
     margin: 0;
@@ -125,17 +130,35 @@ button, input, select {
     overflow: hidden;
 }
 .auth-shell__brand {
-    font-family: var(--font-display);
-    font-size: 22px;
-    letter-spacing: 0.02em;
+    display: flex;
+    align-items: center;
+    gap: 12px;
 }
-.auth-shell__brand span { color: var(--color-accent); }
+.auth-shell__brand img { height: 40px; width: auto; filter: brightness(0) invert(1); opacity: 0.95; }
+.auth-shell__brand-text {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 17px;
+    letter-spacing: 0.04em;
+    line-height: 1.2;
+}
+.auth-shell__brand-text small {
+    display: block;
+    font-family: var(--font-body);
+    font-weight: 400;
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    color: rgba(255,255,255,0.55);
+    text-transform: uppercase;
+}
 .auth-shell__tagline {
     font-family: var(--font-display);
-    font-size: 34px;
-    line-height: 1.25;
+    font-weight: 600;
+    font-size: 32px;
+    line-height: 1.3;
     max-width: 420px;
     margin-top: 40px;
+    letter-spacing: -0.01em;
 }
 .auth-shell__waves { margin-top: 32px; opacity: 0.9; }
 .auth-shell__footnote {
@@ -155,12 +178,17 @@ button, input, select {
 }
 .auth-card__mobile-brand {
     display: none;
+    align-items: center;
+    gap: 10px;
     font-family: var(--font-display);
-    font-size: 20px;
-    margin-bottom: 24px;
+    font-weight: 700;
+    font-size: 15px;
+    color: var(--color-brand-2);
+    margin-bottom: 28px;
 }
+.auth-card__mobile-brand img { height: 30px; width: auto; }
 @media (max-width: 860px) {
-    .auth-card__mobile-brand { display: block; }
+    .auth-card__mobile-brand { display: flex; }
 }
 .auth-card h1 {
     font-size: 26px;
@@ -244,13 +272,17 @@ button, input, select {
     color: #fff;
 }
 .app-topbar__brand {
-    font-family: var(--font-display);
-    font-size: 18px;
     display: flex;
     align-items: center;
     gap: 10px;
 }
-.app-topbar__brand span { color: var(--color-accent); }
+.app-topbar__brand img { height: 28px; width: auto; filter: brightness(0) invert(1); }
+.app-topbar__brand-text {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 15px;
+    letter-spacing: 0.02em;
+}
 .app-topbar__user {
     display: flex;
     align-items: center;

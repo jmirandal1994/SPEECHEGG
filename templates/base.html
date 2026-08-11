@@ -5,13 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Speech Psychology · EEG{% endblock %}</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Newsreader:wght@400;500;600&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="icon" href="{{ url_for('static', filename='images/logo.png') }}">
 </head>
 <body>
 <div class="app-shell">
     <header class="app-topbar">
-        <div class="app-topbar__brand">Speech<span>·</span>Psychology</div>
+        <div class="app-topbar__brand">
+            <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Speech Psychology">
+            <span class="app-topbar__brand-text">Speech Psychology</span>
+        </div>
         <div class="app-topbar__user">
             <span class="badge-rol">{{ session.get('rol', '') }}</span>
             <span>{{ session.get('nombre', '') }}</span>
