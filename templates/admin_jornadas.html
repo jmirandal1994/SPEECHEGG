@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% block title %}Asignar jornadas · Speech Psychology{% endblock %}
+{% block content %}
+
+<div class="page-header">
+    <h1>Asignar jornadas</h1>
+    <p>Define qué día le toca informar a cada doctor. Les va a aparecer en su calendario.</p>
+</div>
+
+<svg class="eeg-wave divider-wave" viewBox="0 0 900 24" xmlns="http://www.w3.org/2000/svg" style="max-width:100%;">
+    <path d="M0,12 L380,12 L388,4 L396,20 L404,12 L900,12" stroke="#2F6FA8"/>
+</svg>
+
+<div class="panel" style="margin-bottom: 20px;">
+    <div class="panel__header">
+        <h2>Nueva jornada</h2>
+    </div>
+    <div style="padding: 22px;">
+        {% if doctores %}
+        <form method="POST" style="display:flex; gap:14px; flex-wrap:wrap; align-items:end;">
+            <div class="field" style="margin-bottom:0; min-width:220px;">
+                <label for="doctor_id">Doctor</label>
+                <select id="doctor_id" name="doctor_id" required
+                        style="width:100%; padding:12px 14px; border:1px solid var(--color-border); border-radius:var(--radius-sm); background:var(--color-bg-card);">
+                    {% for doc in doctores %}
+                        <option value="{{ doc.id }}">{{ doc.nombre }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="field" style="margin-bottom:0;">
+                <label for="fecha">Fecha</label>
+                <input type="date" id="fecha" name="fecha" required
+                       style="padding:12px 14px; border:1px solid var(--color-border); border-radius:var(--radius-sm);">
+            </div>
+            <button type="submit" class="btn btn-primary" style="width:auto;">Asignar</button>
+        </form>
+        {% else %}
+        <p style="color: var(--color-ink-soft); margin: 0;">
+            Todavía no hay doctores registrados. Crea una cuenta de doctor primero.
+        </p>
+        {% endif %}
+    </div>
+</div>
+
+<div class="panel">
+    <div class="panel__header">
+        <h2>Últimas jornadas asignadas</h2>
+    </div>
+    {% if jornadas %}
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>Fecha</th>
+                <th>Doctor</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for j in jornadas %}
+            <tr>
+                <td class="mono">{{ j.fecha }}</td>
+                <td>{{ (j.profiles or {}).nombre or '—' }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <div class="empty-state">Todavía no hay jornadas asignadas.</div>
+    {% endif %}
+</div>
+
+<p style="margin-top: 24px;">
+    <a href="{{ url_for('admin_bp.dashboard') }}">&larr; Volver al panel</a>
+</p>
+
+{% endblock %}

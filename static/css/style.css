@@ -411,3 +411,85 @@ table.data-table tr:last-child td { border-bottom: none; }
     text-align: center;
     color: var(--color-ink-faint);
 }
+
+/* ---------------------------------------------------------------------
+   Calendario mensual del doctor
+   --------------------------------------------------------------------- */
+.calendar-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 18px;
+}
+.calendar-nav h2 {
+    font-size: 18px;
+    text-transform: capitalize;
+}
+.calendar-nav a {
+    font-size: 18px;
+    line-height: 1;
+    padding: 8px 16px;
+    border-radius: var(--radius-sm);
+    background: var(--color-bg-alt);
+    color: var(--color-ink);
+    text-decoration: none;
+}
+.calendar-nav a:hover { background: var(--color-border); }
+
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 8px;
+}
+.calendar-weekday {
+    text-align: center;
+    font-size: 11.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--color-ink-faint);
+    padding-bottom: 6px;
+    font-weight: 600;
+}
+.calendar-day {
+    aspect-ratio: 1;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--color-border);
+    background: var(--color-bg-card);
+    padding: 8px;
+    display: flex;
+    flex-direction: column;
+}
+.calendar-day--otro-mes { opacity: 0.35; }
+.calendar-day--hoy { border-color: var(--color-accent); border-width: 2px; }
+.calendar-day--asignado {
+    background: var(--color-accent-soft);
+    border-color: var(--color-accent);
+}
+.calendar-day--asignado a {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    text-decoration: none;
+    color: var(--color-ink);
+}
+.calendar-day__num {
+    font-family: var(--font-mono);
+    font-weight: 600;
+    font-size: 14px;
+}
+.calendar-day--asignado .calendar-day__num { color: var(--color-accent-strong); }
+.calendar-day__tag {
+    margin-top: auto;
+    font-size: 9.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    color: var(--color-accent-strong);
+    font-weight: 700;
+}
+@media (max-width: 640px) {
+    .calendar-grid { gap: 4px; }
+    .calendar-day { padding: 4px; border-radius: 6px; }
+    .calendar-day__num { font-size: 12px; }
+    .calendar-day__tag { display: none; }
+    .calendar-weekday { font-size: 10px; }
+}

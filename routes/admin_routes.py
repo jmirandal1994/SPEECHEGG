@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, session, g, redirect, url_for, flash, send_file
+from flask import Blueprint, render_template, session, g, redirect, url_for, flash, send_file, request
 import io
 from auth import requiere_admin
 from supabase_client import get_client
@@ -105,3 +105,38 @@ def plantilla_doctor_grid(doctor_id):
         as_attachment=False,
         download_name="plantilla_con_grilla.pdf",
     )
+
+
+@admin_bp.route("/jornadas", methods=["GET", "POST"])
+@requiere_admin
+def jornadas():
+    client = _cliente_sesion()
+
+    if request.method == "POST":
+        doctor_id = request.form.get("doctor_id")
+        fecha = request.form.get("fecha")
+        if not doctor_id or not fecha:
+            flash("Selecciona un doctor y una fecha.", "danger")
+            return redirect(url_for("admin_bp.jornadas"))
+        try:
+            client.table("jornadas").insert({"doctor_id": doctor_id, "fecha": fecha}).execute()
+            flash("Jornada asignada correctamente.", "success")
+        except Exception as e:
+            print(f"[JORNADA ERROR] {repr(e)}")
+            flash("No se pudo asignar (¿ya existía esa fecha para este doctor?).", "danger")
+        return redirect(url_for("admin_bp.jornadas"))
+
+    doctores = (
+        client.table("profiles").select("id, nombre").eq("rol", "doctor").order("nombre").execute()
+    ).data or []
+
+    jornadas_res = (
+        client.table("jornadas")
+        .select("*, profiles(nombre)")
+        .order("fecha", desc=True)
+        .limit(30)
+        .execute()
+    )
+    jornadas_lista = jornadas_res.data or []
+
+    return render_template("admin_jornadas.html", doctores=doctores, jornadas=jornadas_lista)

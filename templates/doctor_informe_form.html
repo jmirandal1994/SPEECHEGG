@@ -7,6 +7,10 @@
     <p>{{ paciente.nombre_completo or 'Paciente' }} — estudio del {{ estudio.fecha_estudio }}</p>
 </div>
 
+<p style="margin-top: -8px; margin-bottom: 18px;">
+    <a href="{{ url_for('doctor_bp.jornada', fecha=estudio.fecha_estudio) }}">&larr; Volver a la jornada del {{ estudio.fecha_estudio }}</a>
+</p>
+
 <svg class="eeg-wave divider-wave" viewBox="0 0 900 24" xmlns="http://www.w3.org/2000/svg" style="max-width:100%;">
     <path d="M0,12 L380,12 L388,4 L396,20 L404,12 L900,12" stroke="#2F6FA8"/>
 </svg>

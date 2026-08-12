@@ -78,7 +78,23 @@ def requiere_admin(vista):
             return redirect(url_for("auth_bp.login"))
         if session.get("rol") != "admin":
             flash("No tienes permisos para acceder a esta sección.", "danger")
-            return redirect(url_for("doctor_bp.dashboard"))
+            return redirect(url_for("auth_bp.index"))
+        g.user_id = session["user_id"]
+        g.rol = session["rol"]
+        g.nombre = session["nombre"]
+        return vista(*args, **kwargs)
+    return envoltura
+
+
+def requiere_coordinadora(vista):
+    @wraps(vista)
+    def envoltura(*args, **kwargs):
+        if "user_id" not in session:
+            flash("Debes iniciar sesión para continuar.", "warning")
+            return redirect(url_for("auth_bp.login"))
+        if session.get("rol") != "coordinadora":
+            flash("No tienes permisos para acceder a esta sección.", "danger")
+            return redirect(url_for("auth_bp.index"))
         g.user_id = session["user_id"]
         g.rol = session["rol"]
         g.nombre = session["nombre"]

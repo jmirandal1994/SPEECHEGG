@@ -24,12 +24,15 @@
 
 <div class="panel">
     <div class="panel__header">
-        <h2>Próximos módulos</h2>
+        <h2>Mi calendario</h2>
     </div>
-    <div class="empty-state">
-        Aquí vas a ver tu lista de pacientes asignados y vas a poder generar el informe EEG
-        de cada uno (usando la plantilla PDF que tu administrador ya configuró para ti).
-        Se construye en la siguiente etapa.
+    <div class="empty-state" style="padding: 30px 22px;">
+        <a href="{{ url_for('doctor_bp.calendario') }}" class="btn btn-primary" style="width: auto; display: inline-flex;">
+            Ir a mi calendario
+        </a>
+        <p style="margin-top: 14px; color: var(--color-ink-faint); font-size: 13.5px;">
+            Ahí ves tus jornadas asignadas, agregas pacientes y generas sus informes.
+        </p>
     </div>
 </div>
 

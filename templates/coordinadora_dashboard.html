@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block title %}Informes EEG · Speech Psychology{% endblock %}
+{% block content %}
+
+<div class="page-header">
+    <h1>Informes generados</h1>
+    <p>Hola, {{ nombre }} — acá aparecen automáticamente los informes que los doctores marcan como informados.</p>
+</div>
+
+<svg class="eeg-wave divider-wave" viewBox="0 0 900 24" xmlns="http://www.w3.org/2000/svg" style="max-width:100%;">
+    <path d="M0,12 L380,12 L388,4 L396,20 L404,12 L900,12" stroke="#2F6FA8"/>
+</svg>
+
+<div class="panel" style="margin-bottom: 20px;">
+    <div style="padding: 18px 22px;">
+        <form method="GET" style="display:flex; align-items:flex-end; gap:12px; flex-wrap:wrap;">
+            <div class="field" style="margin-bottom:0;">
+                <label for="fecha">Filtrar por fecha del estudio</label>
+                <input type="date" id="fecha" name="fecha" value="{{ fecha_filtro }}"
+                       style="padding:10px 12px; border:1px solid var(--color-border); border-radius:var(--radius-sm);">
+            </div>
+            <button type="submit" class="btn btn-primary" style="width:auto;">Filtrar</button>
+            {% if fecha_filtro %}
+                <a href="{{ url_for('coordinadora_bp.dashboard') }}" class="btn btn-secondary" style="width:auto;">Ver todos</a>
+            {% endif %}
+        </form>
+    </div>
+</div>
+
+<div class="panel">
+    <div class="panel__header">
+        <h2>{{ informes|length }} informe{{ 's' if informes|length != 1 else '' }}{% if fecha_filtro %} el {{ fecha_filtro }}{% endif %}</h2>
+    </div>
+
+    {% if informes %}
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>Fecha estudio</th>
+                <th>Paciente</th>
+                <th>RUT</th>
+                <th>Doctor</th>
+                <th>Tipo de registro</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for informe in informes %}
+            {% set estudio = informe.estudios_eeg or {} %}
+            {% set paciente = estudio.pacientes or {} %}
+            <tr>
+                <td class="mono">{{ estudio.fecha_estudio or '—' }}</td>
+                <td>{{ paciente.nombre_completo or '—' }}</td>
+                <td class="mono">{{ paciente.rut or '—' }}</td>
+                <td>{{ (informe.profiles or {}).nombre or '—' }}</td>
+                <td>{{ estudio.tipo_registro or '—' }}</td>
+                <td>
+                    <a href="{{ url_for('coordinadora_bp.descargar', informe_id=informe.id) }}" class="btn btn-secondary" style="width:auto; padding:8px 14px; font-size:13px;">
+                        Descargar PDF
+                    </a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <div class="empty-state">
+        {% if fecha_filtro %}
+            No hay informes generados para esa fecha.
+        {% else %}
+            Todavía no hay informes marcados como informados.
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+
+{% endblock %}

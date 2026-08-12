@@ -4,6 +4,7 @@ from config import Config, validate_config
 from routes.auth_routes import auth_bp
 from routes.doctor_routes import doctor_bp
 from routes.admin_routes import admin_bp
+from routes.coordinadora_routes import coordinadora_bp
 
 
 def create_app():
@@ -16,6 +17,7 @@ def create_app():
     app.register_blueprint(auth_bp)
     app.register_blueprint(doctor_bp)
     app.register_blueprint(admin_bp)
+    app.register_blueprint(coordinadora_bp)
 
     return app
 

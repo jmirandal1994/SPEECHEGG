@@ -76,11 +76,24 @@
 
 <div class="panel" style="margin-top: 20px;">
     <div class="panel__header">
+        <h2>Jornadas</h2>
+    </div>
+    <div class="empty-state" style="padding: 30px 22px;">
+        <a href="{{ url_for('admin_bp.jornadas') }}" class="btn btn-primary" style="width: auto; display: inline-flex;">
+            Asignar jornadas
+        </a>
+        <p style="margin-top: 14px; color: var(--color-ink-faint); font-size: 13.5px;">
+            Define qué día le toca informar a cada doctor.
+        </p>
+    </div>
+</div>
+
+<div class="panel" style="margin-top: 20px;">
+    <div class="panel__header">
         <h2>Próximos módulos</h2>
     </div>
     <div class="empty-state">
         Aquí vas a poder crear cuentas de doctor, cargar el Excel de pacientes,
-        asignar pacientes a cada doctor, gestionar las plantillas PDF por doctor,
         y resolver las solicitudes de corrección. Se construye en la siguiente etapa.
     </div>
 </div>

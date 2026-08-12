@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+{% block title %}Jornada {{ fecha }} · Speech Psychology{% endblock %}
+{% block content %}
+
+<div class="page-header">
+    <h1>Jornada del {{ fecha }}</h1>
+    <p>Agrega los pacientes que vas a informar hoy.</p>
+</div>
+
+<p style="margin-top: -8px; margin-bottom: 18px;">
+    <a href="{{ url_for('doctor_bp.calendario') }}">&larr; Volver al calendario</a>
+</p>
+
+<div class="panel" style="margin-bottom: 20px;">
+    <div class="panel__header">
+        <h2>Agregar paciente</h2>
+    </div>
+    <div style="padding: 22px;">
+        <form method="POST" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; align-items: end;">
+            <div class="field" style="margin-bottom:0;">
+                <label for="nombre_completo">Nombre completo</label>
+                <input type="text" id="nombre_completo" name="nombre_completo" required>
+            </div>
+            <div class="field" style="margin-bottom:0;">
+                <label for="rut">RUT</label>
+                <input type="text" id="rut" name="rut" placeholder="12.345.678-9">
+            </div>
+            <div class="field" style="margin-bottom:0;">
+                <label for="fecha_nacimiento">Fecha de nacimiento</label>
+                <input type="date" id="fecha_nacimiento" name="fecha_nacimiento">
+            </div>
+            <div class="field" style="margin-bottom:0;">
+                <label for="tipo_registro">Tipo de registro</label>
+                <select id="tipo_registro" name="tipo_registro" style="width:100%; padding:12px 14px; border:1px solid var(--color-border); border-radius:var(--radius-sm); background:var(--color-bg-card);">
+                    <option value="vigilia">Vigilia</option>
+                    <option value="sueno">Sueño</option>
+                    <option value="privacion_sueno">Privación de sueño</option>
+                    <option value="video_eeg">Video-EEG</option>
+                    <option value="ambulatorio">Ambulatorio</option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary" style="width: auto;">Agregar</button>
+        </form>
+    </div>
+</div>
+
+<div class="panel">
+    <div class="panel__header">
+        <h2>Pacientes de hoy ({{ estudios|length }})</h2>
+    </div>
+    {% if estudios %}
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>Paciente</th>
+                <th>RUT</th>
+                <th>Tipo de registro</th>
+                <th>Estado</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for estudio in estudios %}
+            {% set paciente = estudio.pacientes or {} %}
+            {% set informado = estudio.informes and estudio.informes[0].marcado_informado %}
+            <tr>
+                <td>{{ paciente.nombre_completo or '—' }}</td>
+                <td class="mono">{{ paciente.rut or '—' }}</td>
+                <td>{{ estudio.tipo_registro or '—' }}</td>
+                <td>
+                    {% if informado %}
+                        <span class="pill pill-online"><span class="pill-dot"></span>Informado</span>
+                    {% else %}
+                        <span class="pill pill-offline"><span class="pill-dot"></span>Pendiente</span>
+                    {% endif %}
+                </td>
+                <td>
+                    <a href="{{ url_for('doctor_bp.informe_estudio', estudio_id=estudio.id) }}" class="btn btn-secondary" style="width:auto; padding:8px 14px; font-size:13px;">
+                        {% if informado %}Ver / regenerar informe{% else %}Informar{% endif %}
+                    </a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <div class="empty-state">Todavía no agregas pacientes en esta jornada.</div>
+    {% endif %}
+</div>
+
+{% endblock %}

@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block title %}Mi calendario · Speech Psychology{% endblock %}
+{% block content %}
+
+<div class="page-header">
+    <h1>Mi calendario</h1>
+    <p>Los días resaltados son tus jornadas asignadas para informar.</p>
+</div>
+
+<svg class="eeg-wave divider-wave" viewBox="0 0 900 24" xmlns="http://www.w3.org/2000/svg" style="max-width:100%;">
+    <path d="M0,12 L380,12 L388,4 L396,20 L404,12 L900,12" stroke="#2F6FA8"/>
+</svg>
+
+<div class="panel">
+    <div style="padding: 22px;">
+
+        <div class="calendar-nav">
+            <a href="?mes={{ mes_anterior }}" aria-label="Mes anterior">‹</a>
+            <h2>{{ nombre_mes }}</h2>
+            <a href="?mes={{ mes_siguiente }}" aria-label="Mes siguiente">›</a>
+        </div>
+
+        <div class="calendar-grid">
+            <div class="calendar-weekday">Lun</div>
+            <div class="calendar-weekday">Mar</div>
+            <div class="calendar-weekday">Mié</div>
+            <div class="calendar-weekday">Jue</div>
+            <div class="calendar-weekday">Vie</div>
+            <div class="calendar-weekday">Sáb</div>
+            <div class="calendar-weekday">Dom</div>
+
+            {% for semana in semanas %}
+                {% for dia in semana %}
+                    {% set dia_iso = dia.isoformat() %}
+                    {% set asignado = dia_iso in dias_asignados %}
+                    <div class="calendar-day
+                        {% if dia.month != mes_actual %} calendar-day--otro-mes{% endif %}
+                        {% if asignado %} calendar-day--asignado{% endif %}
+                        {% if dia == hoy %} calendar-day--hoy{% endif %}">
+                        {% if asignado %}
+                            <a href="{{ url_for('doctor_bp.jornada', fecha=dia_iso) }}">
+                                <span class="calendar-day__num">{{ dia.day }}</span>
+                                <span class="calendar-day__tag">Asignado</span>
+                            </a>
+                        {% else %}
+                            <span class="calendar-day__num">{{ dia.day }}</span>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            {% endfor %}
+        </div>
+
+    </div>
+</div>
+
+{% endblock %}

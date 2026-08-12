@@ -15,7 +15,7 @@ create extension if not exists "pgcrypto";
 create table public.profiles (
     id uuid primary key references auth.users(id) on delete cascade,
     nombre text not null,
-    rol text not null check (rol in ('admin', 'doctor')),
+    rol text not null check (rol in ('admin', 'doctor', 'coordinadora')),
     especialidad text,
     activo boolean not null default true,
     created_at timestamptz not null default now()
@@ -128,6 +128,18 @@ create table public.cargas_excel (
     created_at timestamptz not null default now()
 );
 
+-- ---------------------------------------------------------------------
+-- 9) JORNADAS — días asignados a cada doctor para informar
+-- ---------------------------------------------------------------------
+create table public.jornadas (
+    id uuid primary key default gen_random_uuid(),
+    doctor_id uuid not null references public.profiles(id) on delete cascade,
+    fecha date not null,
+    created_at timestamptz not null default now(),
+    unique (doctor_id, fecha)
+);
+create index idx_jornadas_doctor_fecha on public.jornadas(doctor_id, fecha);
+
 -- =====================================================================
 -- ROW LEVEL SECURITY
 -- Regla general: doctor ve/edita solo lo suyo. Admin ve/edita todo.
@@ -141,6 +153,7 @@ alter table public.informes enable row level security;
 alter table public.correcciones enable row level security;
 alter table public.presencia enable row level security;
 alter table public.cargas_excel enable row level security;
+alter table public.jornadas enable row level security;
 
 -- Función auxiliar: ¿el usuario actual es admin?
 create or replace function public.es_admin()
@@ -155,6 +168,19 @@ as $$
     );
 $$;
 
+-- Función auxiliar: ¿el usuario actual es la coordinadora?
+create or replace function public.es_coordinadora()
+returns boolean
+language sql
+security definer
+stable
+as $$
+    select exists (
+        select 1 from public.profiles
+        where id = auth.uid() and rol = 'coordinadora'
+    );
+$$;
+
 -- profiles: cualquier usuario autenticado puede ver todos los perfiles
 -- (se necesita para mostrar nombres de doctores), pero solo admin edita.
 create policy "profiles_select_authenticated" on public.profiles
@@ -164,9 +190,9 @@ create policy "profiles_update_admin_o_propio" on public.profiles
 create policy "profiles_insert_admin" on public.profiles
     for insert with check (public.es_admin());
 
--- pacientes: doctor ve los suyos, admin ve todos
+-- pacientes: doctor ve los suyos, admin y coordinadora ven todos
 create policy "pacientes_select" on public.pacientes
-    for select using (public.es_admin() or doctor_asignado_id = auth.uid());
+    for select using (public.es_admin() or public.es_coordinadora() or doctor_asignado_id = auth.uid());
 create policy "pacientes_insert" on public.pacientes
     for insert with check (public.es_admin() or doctor_asignado_id = auth.uid());
 create policy "pacientes_update" on public.pacientes
@@ -174,7 +200,7 @@ create policy "pacientes_update" on public.pacientes
 
 -- estudios_eeg: mismo criterio via doctor_id
 create policy "estudios_select" on public.estudios_eeg
-    for select using (public.es_admin() or doctor_id = auth.uid());
+    for select using (public.es_admin() or public.es_coordinadora() or doctor_id = auth.uid());
 create policy "estudios_insert" on public.estudios_eeg
     for insert with check (public.es_admin() or doctor_id = auth.uid());
 create policy "estudios_update" on public.estudios_eeg
@@ -188,9 +214,9 @@ create policy "plantillas_upsert" on public.plantillas_pdf
 create policy "plantillas_update" on public.plantillas_pdf
     for update using (public.es_admin() or doctor_id = auth.uid());
 
--- informes: doctor ve/edita los suyos, admin todos
+-- informes: doctor ve/edita los suyos, admin y coordinadora ven todos (coordinadora solo lectura)
 create policy "informes_select" on public.informes
-    for select using (public.es_admin() or doctor_id = auth.uid());
+    for select using (public.es_admin() or public.es_coordinadora() or doctor_id = auth.uid());
 create policy "informes_insert" on public.informes
     for insert with check (public.es_admin() or doctor_id = auth.uid());
 create policy "informes_update" on public.informes
@@ -216,6 +242,14 @@ create policy "presencia_update_propio" on public.presencia
 -- cargas_excel: solo admin
 create policy "cargas_excel_admin" on public.cargas_excel
     for all using (public.es_admin());
+
+-- jornadas: doctor ve las suyas, admin ve/asigna todas
+create policy "jornadas_select" on public.jornadas
+    for select using (public.es_admin() or doctor_id = auth.uid());
+create policy "jornadas_insert_admin" on public.jornadas
+    for insert with check (public.es_admin());
+create policy "jornadas_delete_admin" on public.jornadas
+    for delete using (public.es_admin());
 
 -- =====================================================================
 -- Trigger: crear fila en profiles automáticamente al crear un usuario
